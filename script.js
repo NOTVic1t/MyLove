@@ -548,10 +548,74 @@ function createTypingIndicator() {
   return div;
 }
 
-function getRandomTime() {
-  const h = Math.floor(Math.random() * 4) + 19; // 19-22
-  const m = Math.floor(Math.random() * 60);
-  return `${h}.${String(m).padStart(2,'0')}`;
+// Pre-assigned timestamps per message index, always ascending within each section
+const chatTimestamps = [
+  // === AWAL KENAL — 4 April 2026, mulai 15:08 ===
+  '15.08', '15.08', '15.08', '15.08', // p, kakk, Ya?, Ini siapa?
+  '15.09', '15.09',                    // Indah kak, Indah mana?
+  '15.10', '15.11', '15.12',           // Penettt, Dapet nomorku, Dari mana ya
+  '15.13', '15.13', '15.14', '15.14', // Kok bisa, Ah ini palingan, Ngga kak, Aku Indah kak
+  '15.15', '15.15', '15.16', '15.16', // Indah penet, Kok bisa gitu, Bisa dong, Kak ga kenal
+  '15.17', '15.17',                    // Temenku yang mana, Andiii
+  '15.18', '15.18', '15.19',           // Oalah pantes, Bukan kak, Lah terus gimana
+  '15.20', '15.21', '15.21',           // Kamu pernah ke Penet, Hah kapan, Kasih tau aku
+  '15.22', '15.23', '15.24',           // Duh penasaran, Aku penasaran, Sini kak
+  '15.24', '15.25', '15.25',           // Sini kemana, Kemana yaa, Kemana hayoo
+  '15.26', '15.27', '15.27',           // Gatau kemana, Jadi makin, Haha masa sih
+  '15.28', '15.29', '15.29',           // Aku sering ke Penet, Masa sih, Mampir kerumah
+  '15.30',                             // Ah aku aja masih penasaran
+  '15.32', '15.33', '15.34', '15.35', // Pengen tau, Boleh tapi ga penting, Penting sih, Boleh kok
+  '15.37', '15.38',                    // Kamu ga cuma penasaran, Ngga aku ga gitu
+
+  // === MOMEN JUJUR — 9 April 2026, mulai 00:26 ===
+  '00.26',                             // Kakak ga suka cewek
+  '00.27', '00.28', '00.28',           // Aku bukan ga suka, Dan sekarang, Yaitu kamu
+  '00.35', '00.35', '00.36', '00.37', // p, p, p, Tidur ya?
+  '00.38', '00.38',                    // Belum kak aku nangis, Nanti aku baca
+  '00.39', '00.39',                    // Kenapa nangis, Kamu jangan nangis
+
+  // === MOMEN NGOMONG SERIUS — 9 April 2026, lanjut ===
+  '00.41', '00.42',                    // Ada yang mau aku omongin, Ngomong apa kak
+  '00.42', '00.43',                    // Ya nanti kalau ketemu, Aku mau ngomong
+  '00.44', '00.44',                    // Kapan ya kak, Takut banget
+  '00.45', '00.46',                    // Takut apa, Malu
+  '00.46', '00.47',                    // Kakak ini masih awal, Aku takut banget
+  '00.48', '00.48',                    // Aku tentuin waktunya, Kan aku udah bilang
+  '00.49', '00.50',                    // Iya kak gapapa, Iya aku luangin
+  '00.51', '00.52',                    // Makasih ya kak, Makasih ya sayang
+  '00.53', '00.54', '00.55',           // Eh kok sayang, Gapapa biar lebih deket, Iya deh sayang
+
+  // === MOMEN KHAWATIR — 14 April 2026, mulai 06:56 ===
+  '06.56', '06.57', '06.59', '07.03', // Sayang kamu kenapa, marah ya, jangan marah, kenapa ada salah
+  '07.06',                             // Aku minta maaf
+  '07.22', '07.22',                    // Ngga loh yang, Aku tidur
+  '07.22', '07.23',                    // Bohong, Sayang kemana ya
+  '07.24', '07.25',                    // Yang aku tidur baru bangun, Sayang maaf
+  '07.26', '07.27',                    // Aku kira kemana, Maaf ya suka ilang
+  '07.28', '07.29', '07.30',           // Iya gapapa, Namanya cape, Udah bobo lagi
+  '07.31', '07.42',                    // Gapapa mulu, Ya gapapa sayang
+
+  // === MOMEN JEMPUT — 15 April 2026, mulai 18:00 ===
+  '18.00', '18.01',                    // Jadi sayang magrib otw, Jadi gaa
+  '18.02', '18.10',                    // Kak mau jemput, Aku otw
+  '18.11', '18.15',                    // Pelan-pelan aja, Ih sabar kak
+  '18.35', '18.40',                    // Sampe mana, Penet 5 menit
+  '19.03', '19.03',                    // Okee sayang tunggu, Sayang hati-hati
+
+  // === PULANG — 15 April 2026, mulai 22:00 ===
+  '22.00', '22.01',                    // Baru sampe rumah, Alhamdulillah
+  '22.02', '22.04',                    // Aku mau jatuh, Hah kok bisa
+  '22.05', '22.06',                    // Maaf ya bikin khawatir, Iya sayang gapapa
+  '22.07', '22.08',                    // I love you, I love you more
+  '22.09', '22.10',                    // Ngga mungkin, Iya mungkin dong
+];
+
+let chatTimeIndex = 0;
+
+function getNextTime() {
+  const t = chatTimestamps[chatTimeIndex] || '22.00';
+  chatTimeIndex++;
+  return t;
 }
 
 function createBubble(sender, text) {
@@ -564,7 +628,7 @@ function createBubble(sender, text) {
 
   const timeDiv = document.createElement('div');
   timeDiv.className = 'bubble-time';
-  timeDiv.textContent = getRandomTime();
+  timeDiv.textContent = getNextTime();
 
   wrap.appendChild(msgDiv);
   wrap.appendChild(timeDiv);
